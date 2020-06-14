@@ -18,7 +18,12 @@ config = {
 
 class RestartACS:
     def __init__(self):
-        logging.Config()
+        logging.basicConfig(
+            filename=os.path.dirname(__file__) + "/logs/restart-acs.log",
+            filemode="a",
+            format="%(asctime)s %(message)s", 
+            level=logging.INFO
+        )
         pass
 
     def check_acs(self, port):
@@ -76,6 +81,7 @@ class RestartACS:
     def run(self):
         if self.check_acs(config['acs_port']) == False:  
             # ACS failed
+            logging.info("ACS failed, restarting...")
             self.kill_acs(config['acs_port'])
             self.start_acs()
 
