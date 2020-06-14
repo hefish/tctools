@@ -31,13 +31,13 @@ class RestartACS:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.setblocking(True)
             s.connect((config['acs_ip'], port))
-            s.send("TEST\n\r".encode("utf-8"))
+            s.send("9300CN123456|CO654321|AY1AZF9C5\n".encode("utf-8"))
 
             ready = select.select([s], [], [], config['timeout'])
             if ready[0]:
                 # ok
                 res = s.recv(1024).decode("utf-8").strip()
-                if res == "无效指令":
+                if res == "941AY3AZFDFA":
                     s.close()
                     return True
             else:
