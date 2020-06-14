@@ -76,7 +76,7 @@ class RestartACS:
 
     def start_acs(self):
         cmd = config['acs_root'] + "/bin/startup.sh"
-        system(cmd)
+        os.system(cmd)
 
     def run(self):
         if self.check_acs(config['acs_port']) == False:  
