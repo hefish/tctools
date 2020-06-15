@@ -24,7 +24,8 @@ class RestartACS:
             format="%(asctime)s %(message)s", 
             level=logging.INFO
         )
-        pass
+        
+        self._acs_pid = 0
 
     def check_acs(self, port):
         try:
@@ -63,6 +64,9 @@ class RestartACS:
         if pid == 0:
             # ACS not running
             return 0
+        
+        self._acs_pid = pid
+
         os.kill(pid, signal.SIGTERM)
         time.sleep(0.5)
         try:
@@ -77,6 +81,21 @@ class RestartACS:
     def start_acs(self):
         cmd = config['acs_root'] + "/bin/startup.sh"
         os.system("su - hefish -c \""+cmd+"\"")
+    
+    def find_java_programs(self):
+        cmd = "ps -e"
+        pipe = os.popen(cmd, "r")
+        out = pipe.readlines()
+        pipe.close()
+
+        pids = []
+        for l in out:
+            m = re.match(r"(\d+)\s+.*\s+.*\s+java", l)
+            if m:
+                pid = int(m.group(1))
+                pids.append(pid)
+
+        return pids
 
     def run(self):
         if self.check_acs(config['acs_port']) == False:  
@@ -84,6 +103,12 @@ class RestartACS:
             logging.info("ACS failed, restarting...")
             self.kill_acs(config['acs_port'])
             self.start_acs()
+        else:
+            # ACS ok, check whether other java program running
+            pids = self.find_java_programs()
+            for pid in pids:
+                if pid != self._acs_pid:
+                    os.kill(pid, signal.SIGTERM)
 
 
 
