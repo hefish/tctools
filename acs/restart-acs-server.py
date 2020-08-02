@@ -82,7 +82,7 @@ class RestartACS:
 
     def start_acs(self):
         cmd = config['acs_root'] + "/bin/startup.sh"
-        os.system("su - hefish -c \""+cmd+"\"")
+        os.system("su - tcsoft -c \""+cmd+"\"")
 
     def run(self):
         if self.check_acs(config['acs_port']) == False:  
